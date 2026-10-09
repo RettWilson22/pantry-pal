@@ -1,116 +1,58 @@
-# Pantry Pal 🧺
+# Pantry Pal
 
-A mobile **pantry & grocery inventory** app built with Flutter. You scan a
-product's barcode, confirm the details, and Pantry Pal keeps an organized,
-searchable inventory of what you have at home — including which items are
-running low so you know what to buy.
+A Flutter app for keeping track of what's in your kitchen. You scan a product's barcode, check the details, and it goes into a pantry list that's grouped by category and flags anything that's running low.
 
-Built for the *On-Device Machine Learning* assignment (Mobile Applications
-Development).
+I built it for the On-Device Machine Learning assignment in Mobile Applications Development.
 
----
+## What it does
 
-## On-device ML feature
+- Scans barcodes with the camera (EAN-13, EAN-8, UPC-A, UPC-E, Code 128 and QR codes)
+- Fills in the name and category for a few known products, otherwise you type the name yourself
+- Lets you set quantity, unit, a low-stock threshold and an optional note before saving
+- Groups the pantry by category, with search and a row of category filters
+- Shows totals at the top (items, units, how many are low). Tapping the low-stock count filters the list down to just those items
+- If you scan something that's already saved, it asks if you want to add one more or edit the existing item instead of making a duplicate
+- Has +/- buttons on every card, and edit, delete and restock on the detail screen
+- Stores everything on the phone, so there's no account and no network needed
 
-The core feature is **barcode scanning**, performed entirely **on-device**:
+## How it works
 
-- On **Android** it uses **Google ML Kit's Barcode Scanning** model.
-- On **iOS** it uses **Apple's Vision** framework.
+Scanning goes through the [`mobile_scanner`](https://pub.dev/packages/mobile_scanner) plugin, which runs Google ML Kit's barcode model on Android and Apple's Vision framework on iOS. Both run on the device, so the camera feed never leaves the phone. That code is in `lib/screens/scan_screen.dart`. It also has buttons for the flashlight and switching cameras.
 
-Both run locally with **no network connection** — nothing leaves the phone.
-This is wired up through the [`mobile_scanner`](https://pub.dev/packages/mobile_scanner)
-plugin in [`lib/screens/scan_screen.dart`](lib/screens/scan_screen.dart).
+If the camera can't start (usually a denied permission) the scanner shows an error with an "Enter manually" button, and there's a "Can't scan?" link under the viewfinder for codes that won't read.
 
-A small **offline product catalog**
-([`lib/services/product_catalog.dart`](lib/services/product_catalog.dart))
-recognizes some common barcodes and pre-fills the item's name and category — but
-the user always reviews and confirms before saving.
-
----
-
-## What the app does
-
-1. **Scan** a barcode with the live camera (the ML step).
-2. **Confirm / edit** the auto-filled details — name, category, quantity, unit,
-   low-stock threshold, and an optional note. *(User input beyond the ML result.)*
-3. **Save** it to a categorized, searchable pantry stored on the device.
-4. **Manage** items over time: adjust quantity inline, edit, restock, or delete.
-
----
-
-## How it meets the rubric
-
-| Requirement | Where it lives |
-|---|---|
-| **On-device ML feature** | Barcode scanning via ML Kit / Vision — `scan_screen.dart` |
-| **User input beyond the ML result** | Add/edit form: name, category, quantity, unit, threshold, note — `item_form_screen.dart` |
-| **Organized saved data** | Dashboard grouped by category, with cards + a detail screen — `home_screen.dart`, `item_detail_screen.dart` |
-| **Manage saved info** | Edit, delete (with confirm), inline +/- quantity, restock — provider + detail screen |
-| **Extra useful feature(s)** | Summary totals (items / units / low-stock), category filter, search, low-stock filter, detail screen |
-| **Empty & error states** | First-run empty pantry, "no matches" state, camera-permission/error view, manual-entry fallback, duplicate-barcode prompt, form validation |
-| **Code organization** | Split into `models/`, `services/`, `providers/`, `screens/`, `widgets/`, `theme/` |
-
----
-
-## Project structure
+All the app state is in one `PantryProvider` (a `ChangeNotifier` from the `provider` package). It handles add/edit/delete, the filters and the summary numbers. `PantryRepository` saves the whole list as a single JSON string in `shared_preferences`. Low-stock items get sorted to the top, then everything else by most recently updated.
 
 ```
 lib/
-├── main.dart                     # App entry; wires up the provider
-├── models/
-│   ├── item_category.dart        # Category enum + labels/icons/colors
-│   └── pantry_item.dart          # Item model with JSON (de)serialization
-├── services/
-│   ├── pantry_repository.dart    # Local persistence (shared_preferences)
-│   └── product_catalog.dart      # Offline barcode → product lookup
-├── providers/
-│   └── pantry_provider.dart      # State, CRUD, filters, summary (ChangeNotifier)
-├── screens/
-│   ├── home_screen.dart          # Dashboard: summary, search, filters, list
-│   ├── scan_screen.dart          # Camera barcode scanner (the ML feature)
-│   ├── item_form_screen.dart     # Add / edit form with validation
-│   └── item_detail_screen.dart   # Detail view + manage actions
-├── widgets/
-│   ├── summary_bar.dart
-│   ├── category_filter.dart
-│   ├── pantry_item_card.dart
-│   ├── quantity_stepper.dart
-│   └── empty_state.dart
-└── theme/
-    └── app_theme.dart            # Material 3 theme
+  main.dart
+  models/      pantry_item.dart, item_category.dart
+  services/    pantry_repository.dart, product_catalog.dart
+  providers/   pantry_provider.dart
+  screens/     home, scan, item form, item detail
+  widgets/     summary bar, category filter, item card, quantity stepper, empty state
+  theme/       app_theme.dart
 ```
-
-State management uses the `provider` package; persistence uses
-`shared_preferences`. Everything works offline.
-
----
 
 ## Running it
 
-Requires the Flutter SDK and a device/emulator with a camera (barcode scanning
-needs a real camera — the iOS simulator has none, so use a physical device or an
-Android emulator with a virtual/webcam camera).
+You need the Flutter SDK (Dart 3.3.4 or newer) and a device with a camera. The iOS simulator doesn't have a camera, so use a real phone or an Android emulator with a webcam or virtual camera set up. Without a camera you can still add items by hand.
 
 ```bash
 flutter pub get
 flutter run
 ```
 
-Run the tests:
+The camera permission is already set up: `CAMERA` in the Android manifest (with `minSdkVersion 21`) and `NSCameraUsageDescription` in the iOS `Info.plist`.
+
+There are unit tests for the item model and the provider (JSON round trip, the low-stock flag, quantity clamping at zero, barcode lookup, search and category filters). They use a fake in-memory repository so they don't need the platform plugin:
 
 ```bash
 flutter test
 ```
 
-### Permissions
-- **Android** — `CAMERA` permission is declared in `AndroidManifest.xml`
-  (`minSdkVersion` is set to 21 for ML Kit).
-- **iOS** — `NSCameraUsageDescription` is set in `Info.plist`.
+## Notes
 
----
+The "catalog" in `product_catalog.dart` is just a hardcoded map of 10 grocery barcodes (Coca-Cola, Cheerios, Jif, a gallon of milk, and so on). A real version would look codes up online, but the assignment was about keeping everything on-device, so for anything not in the map you just fill in the name yourself.
 
-## Dependencies
-
-- [`mobile_scanner`](https://pub.dev/packages/mobile_scanner) — on-device barcode scanning (ML Kit / Vision)
-- [`provider`](https://pub.dev/packages/provider) — state management
-- [`shared_preferences`](https://pub.dev/packages/shared_preferences) — local storage
+Restock bumps the quantity to one above the item's low-stock threshold, which is the smallest amount that clears the "running low" warning.
