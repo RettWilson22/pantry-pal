@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../models/item_category.dart';
 import '../models/pantry_item.dart';
 import 'quantity_stepper.dart';
 

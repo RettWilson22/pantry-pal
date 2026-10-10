@@ -87,7 +87,7 @@ class PantryItem {
       id: json['id'] as String,
       name: json['name'] as String? ?? 'Unnamed item',
       barcode: json['barcode'] as String?,
-      category: ItemCategoryInfo.fromName(json['category'] as String?),
+      category: ItemCategory.fromName(json['category'] as String?),
       quantity: (json['quantity'] as num?)?.toInt() ?? 0,
       unit: json['unit'] as String? ?? 'pcs',
       lowStockThreshold: (json['lowStockThreshold'] as num?)?.toInt() ?? 1,
