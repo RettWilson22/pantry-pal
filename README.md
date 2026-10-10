@@ -45,7 +45,7 @@ flutter run
 
 The camera permission is already set up: `CAMERA` in the Android manifest (with `minSdkVersion 21`) and `NSCameraUsageDescription` in the iOS `Info.plist`.
 
-There are unit tests for the item model and the provider (JSON round trip, the low-stock flag, quantity clamping at zero, barcode lookup, search and category filters). They use a fake in-memory repository so they don't need the platform plugin:
+There are unit tests for the item model and the provider (JSON round trip, the low-stock flag, quantity clamping at zero, barcode lookup, search and category filters), plus a couple for saved data that can't be parsed:
 
 ```bash
 flutter test
