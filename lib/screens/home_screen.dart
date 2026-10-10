@@ -174,8 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return EmptyState(
         icon: Icons.kitchen_outlined,
         title: 'Your pantry is empty',
-        message:
-            'Tap Scan to add your first item by scanning its barcode, or '
+        message: 'Tap Scan to add your first item by scanning its barcode, or '
             'enter it by hand.',
         action: FilledButton.icon(
           onPressed: _startScanFlow,
@@ -203,8 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     // Enum order keeps the sections from jumping around.
-    final categories =
-        ItemCategory.values.where(grouped.containsKey).toList();
+    final categories = ItemCategory.values.where(grouped.containsKey).toList();
 
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),

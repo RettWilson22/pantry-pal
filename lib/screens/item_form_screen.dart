@@ -35,7 +35,17 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
   late String _unit;
   late int _threshold;
 
-  static const _units = ['pcs', 'pack', 'box', 'bottle', 'can', 'g', 'kg', 'ml', 'L'];
+  static const _units = [
+    'pcs',
+    'pack',
+    'box',
+    'bottle',
+    'can',
+    'g',
+    'kg',
+    'ml',
+    'L',
+  ];
 
   @override
   void initState() {
@@ -183,7 +193,6 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
               ),
             ),
             const SizedBox(height: 8),
-
             FilledButton.icon(
               onPressed: _save,
               icon: const Icon(Icons.check),
@@ -214,9 +223,8 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
             children: [
               IconButton(
                 icon: const Icon(Icons.remove),
-                onPressed: _quantity <= 0
-                    ? null
-                    : () => setState(() => _quantity--),
+                onPressed:
+                    _quantity <= 0 ? null : () => setState(() => _quantity--),
               ),
               Text('$_quantity',
                   style: const TextStyle(
@@ -248,8 +256,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           ),
           items: [
-            for (final u in _units)
-              DropdownMenuItem(value: u, child: Text(u)),
+            for (final u in _units) DropdownMenuItem(value: u, child: Text(u)),
           ],
           onChanged: (value) => setState(() => _unit = value ?? 'pcs'),
         ),
@@ -312,8 +319,7 @@ class _BarcodeBanner extends StatelessWidget {
                         fontWeight: FontWeight.w700, fontSize: 15)),
                 if (recognised)
                   Text('Recognised, details pre-filled below',
-                      style: TextStyle(
-                          fontSize: 12, color: scheme.primary)),
+                      style: TextStyle(fontSize: 12, color: scheme.primary)),
               ],
             ),
           ),

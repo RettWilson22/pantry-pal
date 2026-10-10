@@ -79,7 +79,6 @@ class ItemDetailScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-
           if (item.isLowStock) ...[
             _StatusBanner(
               out: item.isOutOfStock,
@@ -105,17 +104,14 @@ class ItemDetailScreen extends StatelessWidget {
                   ),
                   QuantityStepper(
                     value: item.quantity,
-                    onIncrement: () =>
-                        provider.adjustQuantity(item.id, 1),
-                    onDecrement: () =>
-                        provider.adjustQuantity(item.id, -1),
+                    onIncrement: () => provider.adjustQuantity(item.id, 1),
+                    onDecrement: () => provider.adjustQuantity(item.id, -1),
                   ),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 16),
-
           _InfoTile(
             icon: Icons.warning_amber_outlined,
             label: 'Low-stock alert at',
@@ -143,13 +139,11 @@ class ItemDetailScreen extends StatelessWidget {
             label: 'Last updated',
             value: _formatDate(item.updatedAt),
           ),
-
           const SizedBox(height: 24),
           OutlinedButton.icon(
             onPressed: () => _confirmDelete(context, item),
             icon: Icon(Icons.delete_outline, color: scheme.error),
-            label: Text('Delete item',
-                style: TextStyle(color: scheme.error)),
+            label: Text('Delete item', style: TextStyle(color: scheme.error)),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),
               side: BorderSide(color: scheme.error.withOpacity(0.5)),
@@ -196,8 +190,18 @@ class ItemDetailScreen extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }

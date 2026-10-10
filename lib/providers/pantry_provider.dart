@@ -67,9 +67,8 @@ class PantryProvider extends ChangeNotifier {
       }
       if (_showLowStockOnly && !item.isLowStock) return false;
       if (query.isNotEmpty) {
-        final haystack =
-            '${item.name} ${item.note ?? ''} ${item.barcode ?? ''}'
-                .toLowerCase();
+        final haystack = '${item.name} ${item.note ?? ''} ${item.barcode ?? ''}'
+            .toLowerCase();
         if (!haystack.contains(query)) return false;
       }
       return true;

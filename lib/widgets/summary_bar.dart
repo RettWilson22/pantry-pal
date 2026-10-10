@@ -66,9 +66,7 @@ class _StatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final accent = highlight ? scheme.error : scheme.primary;
-    final bg = active
-        ? accent.withOpacity(0.15)
-        : scheme.surface;
+    final bg = active ? accent.withOpacity(0.15) : scheme.surface;
 
     return Expanded(
       child: InkWell(
@@ -90,8 +88,8 @@ class _StatTile extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 value,
-                style: const TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.w800),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
               ),
               Text(
                 label,

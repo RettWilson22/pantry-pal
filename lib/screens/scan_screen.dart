@@ -103,8 +103,8 @@ class _ScanScreenState extends State<ScanScreen> {
                 const SizedBox(height: 12),
                 TextButton.icon(
                   onPressed: _enterManually,
-                  icon: const Icon(Icons.keyboard_outlined,
-                      color: Colors.white),
+                  icon:
+                      const Icon(Icons.keyboard_outlined, color: Colors.white),
                   label: const Text(
                     "Can't scan? Enter manually",
                     style: TextStyle(color: Colors.white),
@@ -128,8 +128,7 @@ class _CameraError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final denied =
-        error.errorCode == MobileScannerErrorCode.permissionDenied;
+    final denied = error.errorCode == MobileScannerErrorCode.permissionDenied;
     return ColoredBox(
       color: Colors.black,
       child: Center(

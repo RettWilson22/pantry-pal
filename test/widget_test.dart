@@ -14,7 +14,8 @@ class FakeRepository extends PantryRepository {
   Future<List<PantryItem>> loadItems() async => List.of(store);
 
   @override
-  Future<void> saveItems(List<PantryItem> items) async => store = List.of(items);
+  Future<void> saveItems(List<PantryItem> items) async =>
+      store = List.of(items);
 }
 
 void main() {
