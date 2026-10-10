@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:pantry_pal/models/item_category.dart';
 import 'package:pantry_pal/models/pantry_item.dart';
@@ -56,7 +57,29 @@ void main() {
     });
   });
 
+  group('PantryRepository', () {
+    test('backs up unreadable data before a save can replace it', () async {
+      SharedPreferences.setMockInitialValues({'pantry_items_v1': '[{"id": 1'});
+      final repository = PantryRepository();
+
+      await expectLater(repository.loadItems(), throwsFormatException);
+      await repository.saveItems([]);
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('pantry_items_v1_backup'), '[{"id": 1');
+    });
+  });
+
   group('PantryProvider', () {
+    test('flags a saved pantry it could not read', () async {
+      SharedPreferences.setMockInitialValues({'pantry_items_v1': 'not json'});
+      final provider = PantryProvider(PantryRepository());
+      await provider.load();
+
+      expect(provider.loadFailed, isTrue);
+      expect(provider.hasNoItems, isTrue);
+    });
+
     test('adds an item and updates the summary', () async {
       final provider = PantryProvider(FakeRepository());
       await provider.load();

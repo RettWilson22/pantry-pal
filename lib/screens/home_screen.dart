@@ -171,6 +171,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildBody(PantryProvider provider) {
     if (provider.hasNoItems) {
+      if (provider.loadFailed) {
+        return const EmptyState(
+          icon: Icons.error_outline,
+          title: "Couldn't load your pantry",
+          message: 'Your saved items could not be read. A copy was kept on '
+              'this device, and anything you add now starts a new list.',
+        );
+      }
       return EmptyState(
         icon: Icons.kitchen_outlined,
         title: 'Your pantry is empty',

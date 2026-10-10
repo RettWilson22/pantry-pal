@@ -27,6 +27,7 @@ class PantryProvider extends ChangeNotifier {
 
   List<PantryItem> _items = [];
   bool _isLoading = true;
+  bool _loadFailed = false;
 
   String _searchQuery = '';
   ItemCategory? _categoryFilter; // null == all categories
@@ -44,10 +45,18 @@ class PantryProvider extends ChangeNotifier {
   /// No saved items at all, as opposed to filters matching nothing.
   bool get hasNoItems => _items.isEmpty;
 
+  /// The saved pantry couldn't be parsed, so the list started out empty. The
+  /// repository kept a backup of the old data.
+  bool get loadFailed => _loadFailed;
+
   Future<void> load() async {
     _isLoading = true;
     notifyListeners();
-    _items = await _repository.loadItems();
+    try {
+      _items = await _repository.loadItems();
+    } on FormatException {
+      _loadFailed = true;
+    }
     _sort();
     _isLoading = false;
     notifyListeners();

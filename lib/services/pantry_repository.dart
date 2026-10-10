@@ -8,8 +8,11 @@ import '../models/pantry_item.dart';
 /// plenty for a list this size.
 class PantryRepository {
   static const String _storageKey = 'pantry_items_v1';
+  static const String _backupKey = 'pantry_items_v1_backup';
 
-  /// Returns an empty list on first launch or if the saved data can't be read.
+  /// Returns an empty list on first launch. If the saved data can't be parsed,
+  /// it's copied to a backup key and a [FormatException] is thrown, so the next
+  /// save can't wipe out the only copy.
   Future<List<PantryItem>> loadItems() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_storageKey);
@@ -20,8 +23,9 @@ class PantryRepository {
       return decoded
           .map((e) => PantryItem.fromJson(e as Map<String, dynamic>))
           .toList();
-    } catch (_) {
-      return [];
+    } catch (e) {
+      await prefs.setString(_backupKey, raw);
+      throw FormatException('Saved pantry could not be read: $e');
     }
   }
 
