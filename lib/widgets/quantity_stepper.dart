@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 
-/// A compact "[-] value [+]" control for adjusting a quantity.
-///
-/// Used both inline on the pantry cards and on the detail screen. The minus
-/// button disables itself at [min] so the user can't go below zero.
+/// Compact minus/value/plus control. Minus is disabled at zero.
 class QuantityStepper extends StatelessWidget {
   final int value;
-  final int min;
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
 
   const QuantityStepper({
     super.key,
     required this.value,
-    this.min = 0,
     required this.onIncrement,
     required this.onDecrement,
   });
@@ -32,7 +27,7 @@ class QuantityStepper extends StatelessWidget {
           IconButton(
             visualDensity: VisualDensity.compact,
             icon: const Icon(Icons.remove),
-            onPressed: value <= min ? null : onDecrement,
+            onPressed: value <= 0 ? null : onDecrement,
             tooltip: 'Decrease',
           ),
           ConstrainedBox(
