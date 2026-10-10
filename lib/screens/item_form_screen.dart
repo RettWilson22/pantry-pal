@@ -73,12 +73,12 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
     if (widget.isEditing) {
       await provider.updateItem(
         widget.existing!.copyWith(
-          name: _nameController.text,
+          name: _nameController.text.trim(),
           category: _category,
           quantity: _quantity,
           unit: _unit,
           lowStockThreshold: _threshold,
-          note: _noteController.text,
+          note: _noteController.text.trim(),
         ),
       );
     } else {
