@@ -6,17 +6,14 @@ import '../models/pantry_item.dart';
 import '../providers/pantry_provider.dart';
 import '../services/product_catalog.dart';
 
-/// Add a new item or edit an existing one.
-///
-/// In add mode it can be seeded with a scanned [barcode]; if that barcode is in
-/// the on-device [ProductCatalog] the name and category are pre-filled, but the
-/// user always reviews and confirms (and can change anything) before saving —
-/// this is the "user input beyond the ML result" step.
+/// Adds a new item or edits an existing one. A scanned [barcode] found in
+/// [ProductCatalog] pre-fills the form, and the user can change anything
+/// before saving.
 class ItemFormScreen extends StatefulWidget {
-  /// When non-null we're editing this item; otherwise we're adding.
+  /// The item being edited, or null when adding.
   final PantryItem? existing;
 
-  /// A scanned barcode to attach to a brand-new item (add mode only).
+  /// Scanned barcode for a new item.
   final String? barcode;
 
   const ItemFormScreen({super.key, this.existing, this.barcode});
@@ -45,7 +42,6 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
     super.initState();
     final existing = widget.existing;
 
-    // Seed from the on-device catalog if this is a recognised barcode.
     final match =
         widget.barcode != null ? ProductCatalog.lookup(widget.barcode!) : null;
 
@@ -117,12 +113,10 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            if (barcode != null && barcode.isNotEmpty)
+            if (barcode != null && barcode.isNotEmpty) ...[
               _BarcodeBanner(barcode: barcode, recognised: recognised),
-            if (barcode != null && barcode.isNotEmpty)
               const SizedBox(height: 16),
-
-            // --- Name (required) ---
+            ],
             TextFormField(
               controller: _nameController,
               textCapitalization: TextCapitalization.words,
@@ -142,8 +136,6 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
               },
             ),
             const SizedBox(height: 16),
-
-            // --- Category ---
             DropdownButtonFormField<ItemCategory>(
               value: _category,
               isExpanded: true,
@@ -168,8 +160,6 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                   setState(() => _category = value ?? ItemCategory.other),
             ),
             const SizedBox(height: 16),
-
-            // --- Quantity + unit ---
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -179,12 +169,8 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
               ],
             ),
             const SizedBox(height: 16),
-
-            // --- Low-stock threshold ---
             _thresholdField(),
             const SizedBox(height: 16),
-
-            // --- Note (optional) ---
             TextFormField(
               controller: _noteController,
               maxLines: 3,
@@ -295,8 +281,6 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
   }
 }
 
-/// A small banner confirming which barcode is attached and whether it was
-/// recognised in the on-device catalog.
 class _BarcodeBanner extends StatelessWidget {
   final String barcode;
   final bool recognised;
@@ -327,7 +311,7 @@ class _BarcodeBanner extends StatelessWidget {
                     style: const TextStyle(
                         fontWeight: FontWeight.w700, fontSize: 15)),
                 if (recognised)
-                  Text('Recognised — details pre-filled below',
+                  Text('Recognised, details pre-filled below',
                       style: TextStyle(
                           fontSize: 12, color: scheme.primary)),
               ],

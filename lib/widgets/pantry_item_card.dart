@@ -3,11 +3,6 @@ import 'package:flutter/material.dart';
 import '../models/pantry_item.dart';
 import 'quantity_stepper.dart';
 
-/// One row in the pantry list: category icon, name, unit/barcode subtitle, a
-/// low-stock badge when relevant, and an inline quantity stepper.
-///
-/// Tapping the body opens the detail screen; the stepper adjusts quantity in
-/// place without leaving the list.
 class PantryItemCard extends StatelessWidget {
   final PantryItem item;
   final VoidCallback onTap;

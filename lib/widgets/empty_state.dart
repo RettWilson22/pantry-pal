@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// A centred icon + message used for empty and error states across the app
-/// (no items yet, no search matches, no barcode found, camera unavailable).
-///
-/// Keeping this in one widget means every "nothing here" screen looks
-/// consistent and we satisfy the empty/error-state requirement in one place.
 class EmptyState extends StatelessWidget {
   final IconData icon;
   final String title;

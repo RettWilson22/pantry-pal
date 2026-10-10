@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../providers/pantry_provider.dart';
 
-/// The dashboard header showing three at-a-glance totals: distinct items,
-/// total units, and how many items are running low.
-///
-/// The low-stock tile doubles as a toggle — tapping it filters the list down to
-/// just the low items, which is the main "what do I need to buy?" use case.
+/// Totals for items, units and low stock. Tapping the low-stock tile filters
+/// the list to just those items.
 class SummaryBar extends StatelessWidget {
   final PantrySummary summary;
   final bool lowStockActive;

@@ -1,27 +1,20 @@
 import 'item_category.dart';
 
-/// A single item stored in the pantry.
-///
-/// This is an immutable value object: edits produce a new instance via
-/// [copyWith]. It owns its own JSON (de)serialisation so the storage layer
-/// ([PantryRepository]) only deals with maps and never with the field details.
+/// An item in the pantry. Immutable; edits go through [copyWith].
 class PantryItem {
   final String id;
   final String name;
 
-  /// The raw barcode value captured by the scanner. Null when the user added
-  /// the item by hand (manual fallback when no barcode is detected).
+  /// Null when the item was added by hand.
   final String? barcode;
 
   final ItemCategory category;
   final int quantity;
 
-  /// Free-text unit such as "pcs", "g", "ml", "pack". Kept as a String so the
-  /// user isn't boxed into a fixed list.
+  /// Unit such as "pcs", "g" or "pack".
   final String unit;
 
-  /// When [quantity] is at or below this number the item is flagged "low".
-  /// Drives the low-stock summary and the restock prompts.
+  /// The item counts as low once [quantity] drops to this number.
   final int lowStockThreshold;
 
   final String? note;

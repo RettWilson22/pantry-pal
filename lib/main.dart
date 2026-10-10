@@ -10,9 +10,6 @@ void main() {
   runApp(const PantryPalApp());
 }
 
-/// App root: builds the single [PantryProvider] (backed by the on-device
-/// [PantryRepository]), loads saved data once at startup, and shows the
-/// dashboard.
 class PantryPalApp extends StatelessWidget {
   const PantryPalApp({super.key});
 

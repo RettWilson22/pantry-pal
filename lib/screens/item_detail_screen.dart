@@ -6,9 +6,8 @@ import '../providers/pantry_provider.dart';
 import '../widgets/quantity_stepper.dart';
 import 'item_form_screen.dart';
 
-/// A full-screen view of one item with edit, delete, quantity and restock
-/// actions. It watches the provider by id so any change (including a stepper
-/// tap here) re-renders live, and it pops itself if the item is deleted.
+/// Looks the item up by id on every build so edits show up live, and pops
+/// itself once the item is deleted.
 class ItemDetailScreen extends StatelessWidget {
   final String itemId;
 
@@ -16,11 +15,9 @@ class ItemDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Rebuild whenever the pantry changes so quantity edits reflect instantly.
     final provider = context.watch<PantryProvider>();
     final item = provider.itemById(itemId);
 
-    // The item was deleted (e.g. from here) — leave the screen safely.
     if (item == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (Navigator.of(context).canPop()) Navigator.of(context).pop();
@@ -83,14 +80,13 @@ class ItemDetailScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          if (item.isLowStock)
+          if (item.isLowStock) ...[
             _StatusBanner(
               out: item.isOutOfStock,
               onRestock: () => _restock(context, item),
             ),
-          if (item.isLowStock) const SizedBox(height: 16),
-
-          // Quantity control card.
+            const SizedBox(height: 16),
+          ],
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -165,7 +161,7 @@ class ItemDetailScreen extends StatelessWidget {
   }
 
   Future<void> _restock(BuildContext context, PantryItem item) async {
-    // Restock back up to one above the alert threshold so it clears "low".
+    // One above the threshold is the smallest amount that clears "low".
     final target = item.lowStockThreshold + 1;
     final delta = target - item.quantity;
     if (delta > 0) {
@@ -194,7 +190,7 @@ class ItemDetailScreen extends StatelessWidget {
 
     if (confirmed == true && context.mounted) {
       await context.read<PantryProvider>().deleteItem(item.id);
-      // The watch above will see the item disappear and pop automatically.
+      // build() pops the screen once the item is gone.
     }
   }
 

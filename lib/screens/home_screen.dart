@@ -12,8 +12,6 @@ import 'item_detail_screen.dart';
 import 'item_form_screen.dart';
 import 'scan_screen.dart';
 
-/// The dashboard: summary header, search, category filters and the grouped
-/// pantry list, plus the scan button that kicks off the whole flow.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -30,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  /// Scan → (duplicate check) → add/edit form. Drives the core ML workflow.
+  /// Scan, then either offer to update a known barcode or open the add form.
   Future<void> _startScanFlow() async {
     final provider = context.read<PantryProvider>();
 
@@ -38,16 +36,14 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(builder: (_) => const ScanScreen()),
     );
 
-    if (!mounted || result == null) return; // cancelled
+    if (!mounted || result == null) return;
 
-    // Empty string == user chose "enter manually" from the scanner.
+    // An empty string means the user chose "Enter manually".
     if (result.isEmpty) {
       _openForm();
       return;
     }
 
-    // A real barcode came back — if we already track it, offer to bump the
-    // quantity instead of creating a duplicate record.
     final existing = provider.findByBarcode(result);
     if (existing != null) {
       await _handleDuplicate(existing);
@@ -174,13 +170,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBody(PantryProvider provider) {
-    // First-run / truly empty pantry.
     if (provider.hasNoItems) {
       return EmptyState(
         icon: Icons.kitchen_outlined,
         title: 'Your pantry is empty',
         message:
-            'Tap Scan to add your first item by scanning its barcode — or '
+            'Tap Scan to add your first item by scanning its barcode, or '
             'enter it by hand.',
         action: FilledButton.icon(
           onPressed: _startScanFlow,
@@ -190,7 +185,6 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    // Has items, but the active filters/search match nothing.
     final grouped = provider.groupedItems;
     if (grouped.isEmpty) {
       return EmptyState(
@@ -208,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    // Render category sections in enum order for a stable layout.
+    // Enum order keeps the sections from jumping around.
     final categories =
         ItemCategory.values.where(grouped.containsKey).toList();
 

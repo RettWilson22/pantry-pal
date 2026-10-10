@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Centralises the visual style so every screen feels like one app.
-///
-/// Material 3 with a fresh green seed (fitting a grocery/pantry theme) plus a
-/// few small tweaks to AppBar, Card and input styling for a more finished look
-/// than the framework defaults.
 class AppTheme {
   static const Color seed = Color(0xFF2E7D32); // pantry green
 

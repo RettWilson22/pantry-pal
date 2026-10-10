@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/item_category.dart';
 
-/// A horizontally scrolling row of choice chips for filtering the list by
-/// category. The leading "All" chip clears the category filter.
+/// Category chips for the list. "All" clears the filter.
 class CategoryFilter extends StatelessWidget {
   final ItemCategory? selected;
   final ValueChanged<ItemCategory?> onChanged;

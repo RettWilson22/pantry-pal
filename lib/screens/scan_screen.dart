@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-/// The on-device ML feature: a live camera barcode scanner.
+/// Live barcode scanner. `mobile_scanner` runs ML Kit on Android and Vision on
+/// iOS, both on-device.
 ///
-/// `mobile_scanner` runs Google ML Kit's Barcode Scanning model on Android and
-/// Apple's Vision framework on iOS — both fully on-device, no network. When a
-/// barcode is recognised this screen pops with its raw value; the caller then
-/// decides whether to create a new item or bump an existing one.
-///
-/// It also covers the ML failure / permission states required by the rubric:
-/// a camera-error view (e.g. permission denied) and a "type it manually"
-/// escape hatch so the user is never stuck if a code won't scan.
+/// Pops with the barcode value, an empty string if the user chose to enter the
+/// item by hand, or null if they backed out.
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
 
@@ -31,8 +26,7 @@ class _ScanScreenState extends State<ScanScreen> {
     ],
   );
 
-  // Guards against the detector firing multiple times while we're already
-  // navigating away with the first result.
+  // The detector can fire again for a different code while we're popping.
   bool _handled = false;
 
   @override
@@ -52,11 +46,7 @@ class _ScanScreenState extends State<ScanScreen> {
     Navigator.of(context).pop(value);
   }
 
-  void _enterManually() {
-    // Pop with an empty string to signal "user opted to type it in" — distinct
-    // from popping null (user cancelled).
-    Navigator.of(context).pop('');
-  }
+  void _enterManually() => Navigator.of(context).pop('');
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +77,6 @@ class _ScanScreenState extends State<ScanScreen> {
             errorBuilder: (context, error, child) =>
                 _CameraError(error: error, onManual: _enterManually),
           ),
-          // Scan reticle + guidance overlay.
           IgnorePointer(
             child: Center(
               child: Container(
@@ -130,7 +119,7 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 }
 
-/// Shown when the camera can't start — most commonly a denied permission.
+/// Shown when the camera can't start, usually because permission was denied.
 class _CameraError extends StatelessWidget {
   final MobileScannerException error;
   final VoidCallback onManual;
