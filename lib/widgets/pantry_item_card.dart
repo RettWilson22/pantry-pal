@@ -89,10 +89,8 @@ class PantryItemCard extends StatelessWidget {
   }
 
   String _subtitle() {
-    final unit = item.unit.isEmpty ? 'units' : item.unit;
-    final parts = <String>['${item.category.label} · $unit'];
-    if (item.barcode != null) parts.add('#${item.barcode}');
-    return parts.join('  ·  ');
+    final barcode = item.barcode == null ? '' : '  ·  #${item.barcode}';
+    return '${item.category.label} · ${item.unit}$barcode';
   }
 }
 

@@ -60,8 +60,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
     _noteController = TextEditingController(text: existing?.note ?? '');
     _category = existing?.category ?? match?.category ?? ItemCategory.other;
     _quantity = existing?.quantity ?? 1;
-    _unit = existing?.unit.isNotEmpty == true ? existing!.unit : 'pcs';
-    if (!_units.contains(_unit)) _unit = 'pcs';
+    _unit = _units.contains(existing?.unit) ? existing!.unit : 'pcs';
     _threshold = existing?.lowStockThreshold ?? 1;
   }
 
