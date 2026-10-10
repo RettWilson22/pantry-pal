@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 
 import '../models/item_category.dart';
@@ -16,12 +18,8 @@ class PantrySummary {
   });
 }
 
-/// The single source of truth for the pantry UI.
-///
-/// Holds the in-memory item list plus the active search/category/low-stock
-/// filters, exposes derived views (filtered list, grouped list, summary), and
-/// owns all create/update/delete operations — each of which persists through
-/// the [PantryRepository] and then notifies listeners so the screens rebuild.
+/// Pantry items plus the active search and filters. Every change is saved
+/// through [PantryRepository] before listeners are notified.
 class PantryProvider extends ChangeNotifier {
   final PantryRepository _repository;
 
@@ -43,11 +41,9 @@ class PantryProvider extends ChangeNotifier {
   ItemCategory? get categoryFilter => _categoryFilter;
   bool get showLowStockOnly => _showLowStockOnly;
 
-  /// True when there are no saved items at all (drives the first-run empty
-  /// state, as opposed to "filters matched nothing").
+  /// No saved items at all, as opposed to filters matching nothing.
   bool get hasNoItems => _items.isEmpty;
 
-  /// Load saved items from storage. Call once at startup.
   Future<void> load() async {
     _isLoading = true;
     notifyListeners();
@@ -63,7 +59,6 @@ class PantryProvider extends ChangeNotifier {
         lowStockCount: _items.where((i) => i.isLowStock).length,
       );
 
-  /// The item list after applying search + category + low-stock filters.
   List<PantryItem> get filteredItems {
     final query = _searchQuery.trim().toLowerCase();
     return _items.where((item) {
@@ -81,7 +76,6 @@ class PantryProvider extends ChangeNotifier {
     }).toList();
   }
 
-  /// Filtered items bucketed by category, for the grouped list view.
   Map<ItemCategory, List<PantryItem>> get groupedItems {
     final map = <ItemCategory, List<PantryItem>>{};
     for (final item in filteredItems) {
@@ -90,25 +84,15 @@ class PantryProvider extends ChangeNotifier {
     return map;
   }
 
-  PantryItem? itemById(String id) {
-    for (final item in _items) {
-      if (item.id == id) return item;
-    }
-    return null;
-  }
+  PantryItem? itemById(String id) =>
+      _items.where((item) => item.id == id).firstOrNull;
 
-  /// Find an existing item by barcode so a re-scan can offer to bump quantity
-  /// instead of creating a duplicate record.
+  /// Lets a re-scan offer to add to an existing item instead of duplicating it.
   PantryItem? findByBarcode(String barcode) {
     final target = barcode.trim();
     if (target.isEmpty) return null;
-    for (final item in _items) {
-      if (item.barcode == target) return item;
-    }
-    return null;
+    return _items.where((item) => item.barcode == target).firstOrNull;
   }
-
-  // ---- Filter mutations -----------------------------------------------------
 
   void setSearchQuery(String value) {
     _searchQuery = value;
@@ -132,8 +116,6 @@ class PantryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ---- CRUD -----------------------------------------------------------------
-
   Future<PantryItem> addItem({
     required String name,
     String? barcode,
@@ -147,12 +129,12 @@ class PantryProvider extends ChangeNotifier {
     final item = PantryItem(
       id: '${now.microsecondsSinceEpoch}_${_idCounter++}',
       name: name.trim(),
-      barcode: barcode?.trim().isEmpty ?? true ? null : barcode!.trim(),
+      barcode: _trimToNull(barcode),
       category: category,
       quantity: quantity,
       unit: unit.trim(),
       lowStockThreshold: lowStockThreshold,
-      note: (note?.trim().isEmpty ?? true) ? null : note!.trim(),
+      note: _trimToNull(note),
       addedAt: now,
       updatedAt: now,
     );
@@ -175,22 +157,18 @@ class PantryProvider extends ChangeNotifier {
     await _persist();
   }
 
-  /// Adjust a single item's quantity by [delta] (clamped at zero). Used by the
-  /// inline +/- steppers on the cards and detail screen.
+  /// Changes an item's quantity by [delta], never going below zero.
   Future<void> adjustQuantity(String id, int delta) async {
     final index = _items.indexWhere((i) => i.id == id);
     if (index == -1) return;
     final current = _items[index];
-    final next = (current.quantity + delta).clamp(0, 1 << 31);
+    final next = max(0, current.quantity + delta);
     _items[index] = current.copyWith(quantity: next, updatedAt: DateTime.now());
     _sort();
     await _persist();
   }
 
-  // ---- Internal -------------------------------------------------------------
-
-  /// Low-stock items float to the top, then newest first. Re-sorting on every
-  /// change keeps the list stable and predictable.
+  /// Low-stock items first, then most recently updated.
   void _sort() {
     _items.sort((a, b) {
       if (a.isLowStock != b.isLowStock) return a.isLowStock ? -1 : 1;
@@ -201,5 +179,10 @@ class PantryProvider extends ChangeNotifier {
   Future<void> _persist() async {
     await _repository.saveItems(_items);
     notifyListeners();
+  }
+
+  static String? _trimToNull(String? value) {
+    final trimmed = value?.trim();
+    return trimmed == null || trimmed.isEmpty ? null : trimmed;
   }
 }
