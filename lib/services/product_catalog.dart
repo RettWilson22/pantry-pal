@@ -1,20 +1,15 @@
 import '../models/item_category.dart';
 
-/// A scanned barcode pre-filled against the local catalog.
+/// What the form pre-fills for a known barcode.
 class CatalogMatch {
   final String name;
   final ItemCategory category;
   const CatalogMatch(this.name, this.category);
 }
 
-/// A tiny, fully on-device catalog of common grocery barcodes.
-///
-/// Real barcode databases live behind a network API, but this assignment keeps
-/// everything on-device, so we ship a small seed map instead. When a scanned
-/// barcode is recognised the add-item form is pre-filled with a sensible name
-/// and category; when it isn't, the user just types the name themselves. This
-/// keeps the scan-to-save flow fast for the common case without ever needing a
-/// connection.
+/// A few hardcoded grocery barcodes. Real barcode databases need a network
+/// lookup and this app keeps everything on the device, so unknown codes are
+/// filled in by hand.
 class ProductCatalog {
   static const Map<String, CatalogMatch> _entries = {
     '049000006344': CatalogMatch('Coca-Cola 12oz Can', ItemCategory.beverages),
