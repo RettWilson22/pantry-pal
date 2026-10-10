@@ -91,12 +91,8 @@ class _HomeScreenState extends State<HomeScreen> {
             SnackBar(content: Text('Added one more ${existing.name}')),
           );
         }
-        break;
       case 'edit':
         _openDetail(existing.id);
-        break;
-      default:
-        break;
     }
   }
 
@@ -121,7 +117,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pantry Pal'),
-        titleTextStyle: Theme.of(context).appBarTheme.titleTextStyle,
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _startScanFlow,
